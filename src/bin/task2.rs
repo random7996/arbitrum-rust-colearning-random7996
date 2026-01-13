@@ -1,5 +1,5 @@
 use alloy::{
-    primitives::{address, utils::format_ether},
+    primitives::{Address, utils::format_ether},
     providers::{Provider, ProviderBuilder},
 };
 use anyhow::Result;
@@ -10,7 +10,11 @@ async fn main() -> Result<()> {
     println!("Try to connect to Arbitrum Sepolia RPC: {}", rpc_url);
     let provider = ProviderBuilder::new().connect_http(rpc_url);
 
-    let address = address!("4f3934D2760dE4EA4e4E36D5f537bF3c9B668E01");
+    let mut args = std::env::args();
+    args.next(); // ignore filepath
+    let address = args.next().expect("Please input your EVM address.");
+    let address = Address::parse_checksummed(address, None)?;
+
     let balance = provider.get_balance(address).await?;
     let eth = format_ether(balance);
 
